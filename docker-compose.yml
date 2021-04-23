@@ -3,7 +3,7 @@ services:
   bot:
     build: .
     environment:
-      - BOT_TOKEN=ODM0MDUxODYzODg3MjE2NjQw.YH7RVA.52tgMolwyzniCd1qrUIZ19qm5qo
+      - BOT_TOKEN=
     depends_on:
       - bot_db
     networks:
