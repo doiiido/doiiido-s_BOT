@@ -48,7 +48,10 @@ async def on_message(message):
 			if index > 0:
 				user_id = int(re.search(r'\d+', message.content).group())
 				if user_id == client.user.id:
-					cursor.execute("INSERT INTO tbl_channels(id, guild, category, name) VALUES(%s, %s, %s, %s)", (channel_id, str(message.guild), str(message.channel.category), str(message.channel)))
+					guild = "".join(c for c in str(message.guild) if c.isalnum() or c in keepcharacters).rstrip()
+					category = "".join(c for c in str(message.channel.category) if c.isalnum() or c in keepcharacters).rstrip()
+					name = "".join(c for c in str(message.channel) if c.isalnum() or c in keepcharacters).rstrip()
+					cursor.execute("INSERT INTO tbl_channels(id, guild, category, name) VALUES(%s, %s, %s, %s)", (channel_id, guild, category, name))
 					mydb.commit()
 					await message.channel.send('Canal Autorizado')
 	else:
