@@ -1,30 +1,28 @@
 version: "3"
 services:
-  app:
+  bot:
     build: .
     environment:
       - BOT_TOKEN=
     depends_on:
-      - db
+      - bot_db
     networks:
-      app_net:
+      bot_net:
         ipv4_address: 192.168.21.10
       
-  db:
-    image: mysql
-    ports:
-      - "32000:3306"
+  bot_db:
+    image: mysql:5.7
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: toor
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     networks:
-      app_net:
+      bot_net:
         ipv4_address: 192.168.21.11
         
 networks:
-  app_net:
+  bot_net:
     ipam:
       driver: default
       config:

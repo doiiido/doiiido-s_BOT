@@ -1,0 +1,22 @@
+CREATE DATABASE BOT;
+
+use BOT;
+
+CREATE TABLE tbl_channels (
+ id VARCHAR(50) NOT NULL,
+ guild VARCHAR(50) NOT NULL,
+ category VARCHAR(50) NOT NULL,
+ name VARCHAR(50) NOT NULL,
+ PRIMARY KEY(id)
+ );
+
+CREATE TABLE tbl_users (
+ id BIGINT NOT NULL AUTO_INCREMENT,
+ user_id VARCHAR(50) NOT NULL,
+ channel_id VARCHAR(50) NOT NULL,
+ nick VARCHAR(50) NOT NULL,
+ valor_sujo INT NOT NULL,
+ PRIMARY KEY(id),
+ FOREIGN KEY (channel_id) REFERENCES tbl_channels (id) ON DELETE CASCADE
+ );
+
