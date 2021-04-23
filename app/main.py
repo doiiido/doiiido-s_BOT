@@ -97,7 +97,12 @@ async def on_message(message):
 			user = cursor.fetchall()
 			if user:
 				for x in user:
-					await message.channel.send( str(x.user_id) + " : " + str(x.nick) + " : " + str(x.valor_sujo))
+					await message.channel.send(x.nick)
+					await message.channel.send('Acumulado:')
+					valor_sujo = str(x.valor_sujo) + " em dinheiro sujo"
+					await message.channel.send(valor_sujo)
+					valor_limpo = "A ser pago: " + str(int(int(x.valor_sujo)*porcentagem)) + " em dinheiro limpo"
+					await message.channel.send(valor_limpo)
 			else: 
 				await message.channel.send("Não há pagamentos pendentes")
 
