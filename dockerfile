@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 # Run app.py when the container launches
 COPY app/ /app
-CMD python3 /app/main.py
+CMD python3 -u /app/main.py

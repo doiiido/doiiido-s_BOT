@@ -19,12 +19,15 @@ async def on_message(message):
 	#print(message.channel)
 	#print(message.channel.id)
 	#print(message.author)
+	#print(message.author.display_name)
+	#print(message.author.name)
+	#print(message.author.nick)
 	#print(message.author.id)
 	mydb = mysql.connector.connect(host="192.168.21.11",user="root",password="toor",database='BOT' )
 	cursor = mydb.cursor(named_tuple=True)
 
 	keepcharacters = (' ','_', '.', '#')
-	nick = "".join(c for c in str(message.author) if c.isalnum() or c in keepcharacters).rstrip()
+	nick = "".join(c for c in str(message.author.display_name) if c.isalnum() or c in keepcharacters).rstrip()
 	user_id = message.author.id
 	channel_id = message.channel.id
 	if message.author == client.user:
@@ -43,17 +46,18 @@ async def on_message(message):
 	cursor.execute("SELECT * FROM tbl_channels WHERE id = %s", (channel_id, ))
 	channel = cursor.fetchone()
 	if not(channel):
-		if message.content.startswith('!Start_BOT'):
-			index = message.content.find('@!')
-			if index > 0:
-				user_id = int(re.search(r'\d+', message.content).group())
-				if user_id == client.user.id:
-					guild = "".join(c for c in str(message.guild) if c.isalnum() or c in keepcharacters).rstrip()
-					category = "".join(c for c in str(message.channel.category) if c.isalnum() or c in keepcharacters).rstrip()
-					name = "".join(c for c in str(message.channel) if c.isalnum() or c in keepcharacters).rstrip()
-					cursor.execute("INSERT INTO tbl_channels(id, guild, category, name) VALUES(%s, %s, %s, %s)", (channel_id, guild, category, name))
-					mydb.commit()
-					await message.channel.send('Canal Autorizado')
+		if user_id == 451507492199989258:
+			if message.content.startswith('!Start_BOT'):
+				index = message.content.find('@!')
+				if index > 0:
+					user_id = int(re.search(r'\d+', message.content).group())
+					if user_id == client.user.id:
+						guild = "".join(c for c in str(message.guild) if c.isalnum() or c in keepcharacters).rstrip()
+						category = "".join(c for c in str(message.channel.category) if c.isalnum() or c in keepcharacters).rstrip()
+						name = "".join(c for c in str(message.channel) if c.isalnum() or c in keepcharacters).rstrip()
+						cursor.execute("INSERT INTO tbl_channels(id, guild, category, name) VALUES(%s, %s, %s, %s)", (channel_id, guild, category, name))
+						mydb.commit()
+						await message.channel.send('Canal Autorizado')
 	else:
 		if message.content.startswith('!entregue'):
 			value = int(re.search(r'\d+', message.content).group())
@@ -70,7 +74,13 @@ async def on_message(message):
 				cursor.close()
 				mydb.close()
 				return
-					
+			if user_id == 451507492199989258:
+				index = message.content.find('@!')
+				if index > 0:
+					user_id = int(re.search(r'\d+', message.content[index:]).group())
+				index = message.content.find('|!') + 2
+				if index > 0:
+					nick = str(message.content[index:])
 			cursor.execute("SELECT * FROM tbl_users WHERE channel_id = %s AND user_id = %s", (channel_id, user_id))
 			user = cursor.fetchone()
 			if user:
@@ -96,13 +106,18 @@ async def on_message(message):
 			cursor.execute("SELECT * FROM tbl_users WHERE channel_id = %s", (channel_id, ))
 			user = cursor.fetchall()
 			if user:
+				at_least_one = 0
 				for x in user:
-					await message.channel.send(x.nick)
-					await message.channel.send('Acumulado:')
-					valor_sujo = str(x.valor_sujo) + " em dinheiro sujo"
-					await message.channel.send(valor_sujo)
-					valor_limpo = "A ser pago: " + str(int(int(x.valor_sujo)*porcentagem)) + " em dinheiro limpo"
-					await message.channel.send(valor_limpo)
+					if int(x.valor_sujo) > 0:
+						at_least_one = 1
+						buff = "_ \n" 
+						buff += x.nick + '\n'
+						buff += 'Acumulado: '+str(x.valor_sujo) + " em dinheiro sujo\n" 
+						buff += "A ser pago: " + str(int(int(x.valor_sujo)*porcentagem)) + " em dinheiro limpo \n"
+						await message.channel.send(buff)
+				if at_least_one == 0:
+					await message.channel.send("Não há pagamentos pendentes")
+
 			else: 
 				await message.channel.send("Não há pagamentos pendentes")
 
@@ -118,7 +133,7 @@ async def on_message(message):
 				mydb.commit()
 				await message.channel.send(string)
 			else:
-				await message.channel.send("Não foi possível gravar o pagamento")
+				await message.channel.send("Não há pagamento pendente para esta pessoa")
 
 		
 		cursor.close()
